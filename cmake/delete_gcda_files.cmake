@@ -1,0 +1,4 @@
+file(GLOB_RECURSE GCDA_FILES "${CMAKE_CURRENT_BINARY_DIR}/*.gcda")
+foreach(GCDA_FILE ${GCDA_FILES})
+    file(REMOVE ${GCDA_FILE})
+endforeach()

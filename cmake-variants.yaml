@@ -1,0 +1,31 @@
+buildType:
+  default: debug
+  choices:
+    debug:
+      short: Debug
+      long: Disable optimizations - include debug information.
+      buildType: Debug
+    release:
+      short: Release
+      long: Optimize for speed - exclude debug information.
+      buildType: Release
+    minsize:
+      short: MinSizeRel
+      long: Optimize for smallest binary size - exclude debug information.
+      buildType: MinSizeRel
+    reldeb:
+      short: RelWithDebInfo
+      long: Optimize for speed - include debug information.
+      buildType: RelWithDebInfo
+    coverage:
+      short: Coverage
+      long: Mostly disable optimizations - include debug information and coverage instrumentation.
+      buildType: Coverage
+    asan:
+      short: ASAN
+      long: Instrument with Address Sanitizer.
+      buildType: ASAN
+    ubsan:
+      short: UBSAN
+      long: Instrument with Undefined Behavior Sanitizer.
+      buildType: ASAN
