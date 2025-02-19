@@ -123,19 +123,18 @@ TEST(FailAction, LambdaMove)
             throw std::runtime_error("error");
         }
         catch (const std::runtime_error&) {
-            EXPECT_EQ(i, 2);
+            EXPECT_EQ(i, 1);
         }
 
-        // This is intentional: the moved-to action is armed.
-        EXPECT_EQ(i, 2);
+        EXPECT_EQ(i, 1);
 
         {
             auto _3 = std::move(_1);
-            EXPECT_EQ(i, 2);
+            EXPECT_EQ(i, 1);
         }
     }
 
-    EXPECT_EQ(i, 2);
+    EXPECT_EQ(i, 1);
 }
 
 TEST(FailAction, ConstLValueLambda)

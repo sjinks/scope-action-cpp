@@ -278,7 +278,8 @@ public:
                   std::bool_constant<
                       std::is_nothrow_constructible_v<ExitFunc, Func> && !std::is_lvalue_reference_v<Func>>()
               )
-          )
+          ),
+          m_uncaught_exceptions_count(std::uncaught_exceptions())
     {}
     catch (...) {
         fn();
@@ -301,7 +302,8 @@ public:
      */
     template<typename Func>
     requires(detail::can_move_construct_from_noexcept<fail_action, ExitFunc, Func>)
-    explicit fail_action(Func&& fn) noexcept : m_exit_function(std::forward<Func>(fn))
+    explicit fail_action(Func&& fn) noexcept
+        : m_exit_function(std::forward<Func>(fn)), m_uncaught_exceptions_count(std::uncaught_exceptions())
     {}
 
     /**
@@ -333,7 +335,8 @@ public:
                   std::forward<ExitFunc>(other.m_exit_function),
                   std::bool_constant<std::is_nothrow_move_constructible_v<ExitFunc>>()
               )
-          )
+          ),
+          m_uncaught_exceptions_count(other.m_uncaught_exceptions_count)
     {
         other.release();
     }
@@ -374,8 +377,8 @@ public:
     void release() noexcept { this->m_uncaught_exceptions_count = std::numeric_limits<int>::max(); }
 
 private:
-    ExitFunc m_exit_function;                                      ///< The stored exit function.
-    int m_uncaught_exceptions_count = std::uncaught_exceptions();  ///< The counter of uncaught exceptions.
+    ExitFunc m_exit_function;         ///< The stored exit function.
+    int m_uncaught_exceptions_count;  ///< The counter of uncaught exceptions.
 };
 
 /**
@@ -447,7 +450,8 @@ public:
                   std::bool_constant<
                       std::is_nothrow_constructible_v<ExitFunc, Func> && !std::is_lvalue_reference_v<Func>>()
               )
-          )
+          ),
+          m_uncaught_exceptions_count(std::uncaught_exceptions())
     {}
 
     /**
@@ -467,7 +471,8 @@ public:
      */
     template<typename Func>
     requires detail::can_move_construct_from_noexcept<success_action, ExitFunc, Func>
-    explicit success_action(Func&& fn) noexcept : m_exit_function(std::forward<Func>(fn))
+    explicit success_action(Func&& fn) noexcept
+        : m_exit_function(std::forward<Func>(fn)), m_uncaught_exceptions_count(std::uncaught_exceptions())
     {}
 
     /**
@@ -499,7 +504,8 @@ public:
                   std::forward<ExitFunc>(other.m_exit_function),
                   std::bool_constant<std::is_nothrow_move_constructible_v<ExitFunc>>()
               )
-          )
+          ),
+          m_uncaught_exceptions_count(other.m_uncaught_exceptions_count)
     {
         other.release();
     }
@@ -542,8 +548,8 @@ public:
     void release() noexcept { this->m_uncaught_exceptions_count = std::numeric_limits<int>::min(); }
 
 private:
-    ExitFunc m_exit_function;                                      ///< The stored exit function.
-    int m_uncaught_exceptions_count = std::uncaught_exceptions();  ///< The counter of uncaught exceptions.
+    ExitFunc m_exit_function;         ///< The stored exit function.
+    int m_uncaught_exceptions_count;  ///< The counter of uncaught exceptions.
 };
 
 /**
