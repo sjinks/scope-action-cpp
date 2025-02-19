@@ -1,5 +1,9 @@
 # Scope Action Utilities
 
+[![Build and Test](https://github.com/sjinks/scope-action-cpp/actions/workflows/ci.yml/badge.svg)](https://github.com/sjinks/scope-action-cpp/actions/workflows/ci.yml)
+[![CodeQL](https://github.com/sjinks/scope-action-cpp/actions/workflows/codeql.yml/badge.svg)](https://github.com/sjinks/scope-action-cpp/actions/workflows/codeql.yml)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=sjinks_scope-action-cpp&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=sjinks_scope-action-cpp)
+
 ## Overview
 
 This project provides a set of scope guard utilities for managing exit actions in C++. These utilities ensure that specified actions are executed when a scope is exited, regardless of how the exit occurs. The scope guards include:
