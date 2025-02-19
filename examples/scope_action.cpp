@@ -3,6 +3,7 @@
 #include <cstdlib>
 #include <ctime>
 #include <iostream>
+#include <random>
 #include <string_view>
 
 #include "scope_action.h"
@@ -18,8 +19,11 @@ void print_exit_status(std::string_view name, bool exit_status, bool did_throw)
 
 void maybe_throw()
 {
-    // NOLINTNEXTLINE(concurrency-mt-unsafe, cert-msc50-cpp)
-    if (std::rand() >= RAND_MAX / 2) {
+    static std::random_device rd;
+    static std::mt19937 gen(rd());
+    static std::uniform_int_distribution<> dis(0, RAND_MAX);
+
+    if (dis(gen) >= RAND_MAX / 2) {
         throw std::exception{};
     }
 }
@@ -30,9 +34,6 @@ int main()
 {
     bool exit_status = false;
     bool did_throw   = false;
-
-    // NOLINTNEXTLINE(cert-msc51-cpp)
-    std::srand(static_cast<unsigned int>(std::time(nullptr)));
 
     // Manual handling at "end of scope"
     try {
