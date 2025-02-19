@@ -206,3 +206,24 @@ TEST(FailAction, MoveAction)
         EXPECT_EQ(i, 0);
     }
 }
+
+TEST(FailAction, ThrowInCopyCtor)
+{
+    class action {
+    public:
+        action(int& i) : m_i(&i) {}
+
+        [[noreturn]] action(const action&) { throw std::runtime_error("copy ctor"); }
+        action(action&& other) = delete;
+
+        void operator()() { *this->m_i += 1; }
+
+    private:
+        int* m_i = nullptr;
+    };
+
+    int i = 0;
+    action a(i);
+    EXPECT_THROW(auto _ = wwa::utils::fail_action(a), std::runtime_error);
+    EXPECT_EQ(i, 1);
+}

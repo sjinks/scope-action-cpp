@@ -198,7 +198,7 @@ TEST(ExitAction, Movable)
 
 // Original tests :-)
 
-TEST(ExitAction, CopyToThrow)
+TEST(ExitAction, CopyCanThrow)
 {
     class action {
     public:
