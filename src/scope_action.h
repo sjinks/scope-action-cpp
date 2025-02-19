@@ -85,7 +85,7 @@ const T& conditional_forward(T&& t, std::false_type)  // NOLINT(cppcoreguideline
  * the exit function. This can lead to surprising behavior.
  */
 template<typename ExitFunc>
-class [[nodiscard]] exit_action {
+class [[nodiscard("The object must be used to ensure the exit function is called on scope exit.")]] exit_action {
 public:
     /**
      * @brief Constructs a new @a exit_action from an exit function of type @a Func.
@@ -106,7 +106,7 @@ public:
      */
     template<typename Func>
     requires(detail::can_construct_from<exit_action, ExitFunc, Func>)
-    [[nodiscard]] explicit exit_action(
+    explicit exit_action(
         Func&& fn
     ) noexcept(std::is_nothrow_constructible_v<ExitFunc, Func> || std::is_nothrow_constructible_v<ExitFunc, Func&>)
     try
@@ -116,8 +116,7 @@ public:
                   std::bool_constant<
                       std::is_nothrow_constructible_v<ExitFunc, Func> && !std::is_lvalue_reference_v<Func>>()
               )
-          ),
-          m_is_armed(true)
+          )
     {}
     catch (...) {
         fn();
@@ -140,7 +139,7 @@ public:
      */
     template<typename Func>
     requires(detail::can_move_construct_from_noexcept<exit_action, ExitFunc, Func>)
-    explicit exit_action(Func&& fn) noexcept : m_exit_function(std::forward<Func>(fn)), m_is_armed(true)
+    explicit exit_action(Func&& fn) noexcept : m_exit_function(std::forward<Func>(fn))
     {}
 
     /**
@@ -209,7 +208,7 @@ public:
 
 private:
     ExitFunc m_exit_function;  ///< The stored exit function.
-    bool m_is_armed;           ///< Whether this `exit_action` is active.
+    bool m_is_armed = true;    ///< Whether this `exit_action` is active.
 };
 
 /**
@@ -244,7 +243,7 @@ exit_action(ExitFunc) -> exit_action<ExitFunc>;
  * the destruction.
  */
 template<typename ExitFunc>
-class [[nodiscard]] fail_action {
+class [[nodiscard("The object must be used to ensure the exit function is called due to an exception.")]] fail_action {
 public:
     /**
      * @brief Constructs a new @a fail_action from an exit function of type @a Func.
@@ -278,8 +277,7 @@ public:
                   std::bool_constant<
                       std::is_nothrow_constructible_v<ExitFunc, Func> && !std::is_lvalue_reference_v<Func>>()
               )
-          ),
-          m_uncaught_exceptions_count(std::uncaught_exceptions())
+          )
     {}
     catch (...) {
         fn();
@@ -302,8 +300,7 @@ public:
      */
     template<typename Func>
     requires(detail::can_move_construct_from_noexcept<fail_action, ExitFunc, Func>)
-    explicit fail_action(Func&& fn) noexcept
-        : m_exit_function(std::forward<Func>(fn)), m_uncaught_exceptions_count(std::uncaught_exceptions())
+    explicit fail_action(Func&& fn) noexcept : m_exit_function(std::forward<Func>(fn))
     {}
 
     /**
@@ -377,8 +374,8 @@ public:
     void release() noexcept { this->m_uncaught_exceptions_count = std::numeric_limits<int>::max(); }
 
 private:
-    ExitFunc m_exit_function;         ///< The stored exit function.
-    int m_uncaught_exceptions_count;  ///< The counter of uncaught exceptions.
+    ExitFunc m_exit_function;                                      ///< The stored exit function.
+    int m_uncaught_exceptions_count = std::uncaught_exceptions();  ///< The counter of uncaught exceptions.
 };
 
 /**
@@ -417,7 +414,9 @@ fail_action(ExitFunc) -> fail_action<ExitFunc>;
  * calling the exit function. This can lead to surprising behavior.
  */
 template<typename ExitFunc>
-class [[nodiscard]] success_action {
+class [[nodiscard(
+    "The object must be used to ensure the exit function is called on a clean scope exit."
+)]] success_action {
 public:
     /**
      * @brief Constructs a new @a success_action from an exit function of type @a Func.
@@ -450,8 +449,7 @@ public:
                   std::bool_constant<
                       std::is_nothrow_constructible_v<ExitFunc, Func> && !std::is_lvalue_reference_v<Func>>()
               )
-          ),
-          m_uncaught_exceptions_count(std::uncaught_exceptions())
+          )
     {}
 
     /**
@@ -471,8 +469,7 @@ public:
      */
     template<typename Func>
     requires detail::can_move_construct_from_noexcept<success_action, ExitFunc, Func>
-    explicit success_action(Func&& fn) noexcept
-        : m_exit_function(std::forward<Func>(fn)), m_uncaught_exceptions_count(std::uncaught_exceptions())
+    explicit success_action(Func&& fn) noexcept : m_exit_function(std::forward<Func>(fn))
     {}
 
     /**
@@ -548,8 +545,8 @@ public:
     void release() noexcept { this->m_uncaught_exceptions_count = std::numeric_limits<int>::min(); }
 
 private:
-    ExitFunc m_exit_function;         ///< The stored exit function.
-    int m_uncaught_exceptions_count;  ///< The counter of uncaught exceptions.
+    ExitFunc m_exit_function;                                      ///< The stored exit function.
+    int m_uncaught_exceptions_count = std::uncaught_exceptions();  ///< The counter of uncaught exceptions.
 };
 
 /**
