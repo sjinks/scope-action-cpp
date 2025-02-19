@@ -8,7 +8,7 @@ set(CTEST_MEMORYCHECK_TYPE "Valgrind")
 
 ctest_start(Experimental)
 if(CTEST_MEMORYCHECK_COMMAND)
-    set(options -DCMAKE_CXX_COMPILER=clang++ -DBUILD_BENCHMARKS=OFF)
+    set(options -DCMAKE_CXX_COMPILER=clang++ -DBUILD_DOCS=OFF -DBUILD_EXAMPLES=OFF)
     ctest_configure(OPTIONS "${options}")
     ctest_build()
     ctest_memcheck(
