@@ -70,7 +70,7 @@ TEST(SuccessAction, LeaveScopeWithoutException)
     {
         j = 0;
         try {
-            G g;
+            const G g;
             throw std::exception();
         }
         catch (...) {
@@ -110,7 +110,7 @@ TEST(SuccessAction, LambdaMove)
         EXPECT_EQ(i, 1);
 
         {
-            auto _2 = std::move(_1);
+            auto _2 = std::move(_1);  // NOLINT(bugprone-use-after-move)
             EXPECT_EQ(i, 1);
         }
 
@@ -118,7 +118,7 @@ TEST(SuccessAction, LambdaMove)
 
         {
             try {
-                auto _3 = std::move(_1);
+                auto _3 = std::move(_1);  // NOLINT(bugprone-use-after-move)
                 EXPECT_EQ(i, 1);
                 throw std::runtime_error("error");
             }

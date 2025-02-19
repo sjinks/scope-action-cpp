@@ -2,4 +2,6 @@
 InheritParentConfig: true
 Checks: >
   -readability-function-cognitive-complexity,
-  -cppcoreguidelines-special-member-functions
+  -cppcoreguidelines-special-member-functions,
+  -clang-analyzer-cplusplus.Move,
+  -clang-analyzer-deadcode.DeadStores

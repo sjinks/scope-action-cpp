@@ -56,7 +56,7 @@ TEST(ExitAction, LambdaMove)
         EXPECT_EQ(i, 1);
 
         {
-            auto _2 = std::move(_1);
+            auto _2 = std::move(_1);  // NOLINT(bugprone-use-after-move)
             EXPECT_EQ(i, 1);
         }
 
@@ -186,7 +186,7 @@ TEST(ExitAction, Movable)
         EXPECT_EQ(i, 1);
 
         {
-            auto _2 = std::move(_1);
+            auto _2 = std::move(_1);  // NOLINT(bugprone-use-after-move)
             EXPECT_EQ(i, 1);
         }
 
