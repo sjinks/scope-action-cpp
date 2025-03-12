@@ -6,11 +6,12 @@
 
 ## Overview
 
-This project provides a set of scope guard utilities for managing exit actions in C++. These utilities ensure that specified actions are executed when a scope is exited, regardless of how the exit occurs. The scope guards include:
+This project provides a set of utilities for managing exit actions and resource handling in C++. These utilities ensure that specified actions are executed when a scope is exited, regardless of (or depending on) how the exit occurs. The scope guards include:
 
 - `exit_action`: Executes an action when the scope is exited.
 - `fail_action`: Executes an action when the scope is exited due to an exception.
 - `success_action`: Executes an action when the scope is exited normally.
+- `unique_resource`: Manages a resource through a handle and disposes of that resource upon destruction (scope exit).
 
 These utilities are useful for ensuring that resources are properly released or actions are taken when a scope is exited.
 
@@ -19,10 +20,13 @@ These utilities are useful for ensuring that resources are properly released or 
 - **exit_action**: Calls its exit function on destruction, when a scope is exited.
 - **fail_action**: Calls its exit function when a scope is exited via an exception.
 - **success_action**: Calls its exit function when a scope is exited normally.
+- **unique_resource**: Manages a resource with a custom deleter, ensuring the resource is released when the scope is exited.
 
 ## Usage
 
 ### Example Usage
+
+#### Scope Guards
 
 ```cpp
 #include <iostream>
@@ -72,6 +76,29 @@ int main()
         did_throw = true;
     }
     std::cout << "success_action: " << exit_status << ", did_throw: " << did_throw << std::endl;
+
+    return 0;
+}
+```
+
+#### `unique_resource`
+
+```cpp
+#include <cstdio>
+#include <unique_resource.h>
+
+int main()
+{
+    auto file = wwa::utils::make_unique_resource_checked(
+        std::fopen("potentially_nonexistent_file.txt", "r"), nullptr, std::fclose
+    );
+
+    if (file.get() != nullptr) {
+        std::puts("The file exists.\n");
+    }
+    else {
+        std::puts("The file does not exist.\n");
+    }
 
     return 0;
 }
@@ -142,6 +169,50 @@ public:
 
     void release() noexcept;
 };
+```
+
+### `unique_resource`
+
+A universal RAII resource handle wrapper for resource handles that owns and manages a resource through a handle and disposes of that resource upon destruction.
+
+```cpp
+template<typename Resource, typename Deleter>
+class [[nodiscard]] unique_resource {
+public:
+    unique_resource();
+
+    template<typename Res, typename Del>
+    unique_resource(Res&& r, Del&& d) noexcept(
+        (std::is_nothrow_constructible_v<WrappedResource, Res> || std::is_nothrow_constructible_v<WrappedResource, Res&>) &&
+        (std::is_nothrow_constructible_v<Deleter, Del> || std::is_nothrow_constructible_v<Deleter, Del&>)
+    );
+
+    unique_resource(unique_resource&& other) noexcept(std::is_nothrow_move_constructible_v<Resource> && std::is_nothrow_move_constructible_v<Deleter>);
+    ~unique_resource() noexcept;
+
+    unique_resource& operator=(unique_resource&& other) noexcept(
+        std::is_nothrow_move_assignable_v<Resource> && std::is_nothrow_move_assignable_v<Deleter>
+    )
+
+    void release() noexcept;
+    void reset() noexcept;
+
+    template<typename Res>
+    void reset(Res&& r);
+
+    const Resource& get() const noexcept;
+    const Deleter& get_deleter() const noexcept;
+
+    std::add_lvalue_reference_t<std::remove_pointer_t<Resource>> operator*() const noexcept;
+    Resource operator->() const noexcept
+};
+
+template<typename Resource, typename Deleter, typename Invalid = std::decay_t<Resource>>
+unique_resource<std::decay_t<Resource>, std::decay_t<Deleter>>
+make_unique_resource_checked(Resource&& r, const Invalid& invalid, Deleter&& d) noexcept(
+    std::is_nothrow_constructible_v<std::decay_t<Resource>, Resource> &&
+    std::is_nothrow_constructible_v<std::decay_t<Deleter>, Deleter>
+);
 ```
 
 ## Building and Testing
