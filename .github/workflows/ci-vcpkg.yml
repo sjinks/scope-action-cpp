@@ -47,11 +47,6 @@ jobs:
       - name: Set up vcpkg
         uses: lukka/run-vcpkg@5e0cab206a5ea620130caf672fce3e4a6b5666a1 # v11.5
 
-      # - name: Fix for AppleClang
-      #   run: |
-      #     sudo xcode-select -s /Applications/Xcode_16.2.app/Contents/Developer
-      #   if: runner.os == 'macOS'
-
       - name: Build and test
         run: |
           cmake --preset debug-vcpkg -DBUILD_DOCS=OFF -DBUILD_EXAMPLES=OFF
