@@ -13,6 +13,7 @@ add_executable(
     exit_action.cpp
     fail_action.cpp
     success_action.cpp
+    unique_resource.cpp
 )
 
 target_link_libraries("${TEST_TARGET}" PRIVATE ${PROJECT_NAME} GTest::gtest_main)
