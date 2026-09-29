@@ -8,3 +8,6 @@ set_directory_properties(PROPERTIES INCLUDE_DIRECTORIES "${CMAKE_SOURCE_DIR}/src
 
 add_executable(scope_action scope_action.cpp)
 target_link_libraries(scope_action PRIVATE wwa::scope_action)
+
+add_executable(unique_resource unique_resource.cpp)
+target_link_libraries(unique_resource PRIVATE wwa::scope_action)
