@@ -574,7 +574,7 @@ private:
     unique_resource(
         Res&& r, Del&& d, dummy_scope_guard dummy
     ) noexcept(std::is_nothrow_constructible_v<Resource, Res> && std::is_nothrow_constructible_v<Deleter, Del>)
-        : m_resource(std::forward<Res>(r), dummy), m_deleter(std::forward<Deleter>(d), dummy)
+        : m_resource(std::forward<Res>(r), dummy), m_deleter(std::forward<Del>(d), dummy)
     {}
 };
 
@@ -631,7 +631,7 @@ make_unique_resource_checked(Res&& r, const Invalid& invalid, Del&& d)
 
 /**
  * @example unique_resource.cpp
- * Example of using `unqiue_resource` and `make_unique_resource_checked`.
+ * Example of using `unique_resource` and `make_unique_resource_checked`.
  */
 
 }  // namespace wwa::utils

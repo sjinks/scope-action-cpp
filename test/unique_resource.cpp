@@ -89,6 +89,23 @@ TEST(UniqueResource, MakeChecked_Invalid)
     EXPECT_FALSE(run);
 }
 
+TEST(UniqueResource, MakeChecked_InvalidPreservesLvalueDeleter)
+{
+    struct TrackingDeleter {
+        bool* moved;
+        explicit TrackingDeleter(bool& flag) : moved(&flag) {}
+        TrackingDeleter(const TrackingDeleter&) = default;
+        TrackingDeleter(TrackingDeleter&& other) noexcept : moved(other.moved) { *moved = true; }
+        void operator()(int) const {}
+    };
+
+    bool moved = false;
+    TrackingDeleter deleter(moved);
+    const auto resource = wwa::utils::make_unique_resource_checked(-1, -1, deleter);
+    EXPECT_FALSE(moved);
+    EXPECT_EQ(resource.get(), -1);
+}
+
 TEST(UniqueResource, MakeChecked_Valid)
 {
     bool run  = false;
